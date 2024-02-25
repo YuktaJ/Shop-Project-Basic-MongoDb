@@ -20,6 +20,7 @@ exports.postAddProduct = (req, res, next) => {
     price: price,
     imageUrl: imageUrl,
     description: description,
+    userId: req.user, //id req.user._id apne ap utha lega
   });
   product
     .save()
@@ -77,6 +78,8 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
   Product.find()
+    // .select("title price -_id")
+    // .populate("userId", "name")
     .then((products) => {
       res.render("admin/products", {
         prods: products,

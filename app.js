@@ -3,9 +3,9 @@ const Mogoose = require("mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
 
-// const errorController = require('./controllers/error');
+const errorController = require("./controllers/error");
 const Product = require("./models/product");
-// const User = require("./models/user");
+const User = require("./models/user");
 // const Cart = require('./models/cart');
 // const CartItem = require('./models/cart-item');
 // const Order = require('./models/order');
@@ -22,29 +22,35 @@ const shopRoutes = require("./routes/shop");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
-// app.use((req, res, next) => {
-//   User.findById("65d9b9bf2d029616f33516e1")
-//     .then((user) => {
-//       req.user = new User(user.username, user.email, user.cart, user._id);
-//       next();
-//     })
-//     .catch((error) => {
-//       console.log(error);
-//     });
-// });
+app.use((req, res, next) => {
+  User.findById("65db296f96bfd06ba8e85976")
+    .then((user) => {
+      console.log(user);
+      req.user = user;
+      next();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
-
-// app.use(errorController.get404);
-// mongoConenct(() => {
-//   app.listen(3000);
-// });
-
+app.use(errorController.get404);
 Mogoose.connect(
   "mongodb+srv://nitinahuja240:good1234@shop.i4igw4d.mongodb.net/"
 )
   .then(() => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          name: "Nitin",
+          email: "nitinahuja240@gmail.com",
+          cart: { items: [] },
+        });
+        user.save();
+      }
+    });
     app.listen(3000);
     console.log("Connected!");
   })
